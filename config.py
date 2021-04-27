@@ -11,12 +11,19 @@ DATASET_PATH_z_line = os.path.join(DATASET_PATH, 'z-line')
 DATASET_PATH_bbps_0_1 = os.path.join(DATASET_PATH, 'bbps-0-1')
 DATASET_PATH_pylorus = os.path.join(DATASET_PATH, 'pylorus')
 JSON_FILE_PATH = os.path.join(DATASET_PATH, 'data.json')
-BATCH_SIZE = 4
 CLASS_NAMES = ('cecum', 'dyed-lifted-polyps', 'dyed-resection-margins', 'retroflex-stomach', 'bbps-2-3', 'polyps',
                'z-line', 'bbps-0-1', 'pylorus')
+BATCH_SIZE = 8
 NUMBER_OF_CLASSES = 9
-INPUT_SHAPE = (224, 224, 3)
+INPUT_SHAPE = (None, 224, 224, 3)
 LEARNING_RATE = 0.0001
-EPOCHS = 40
+EPOCHS = 5
 LOGS_DIR = os.path.join(DATASET_PATH, 'logs_dir')
+
+# choose a network
+# model = "resnet18"
+model = "resnet34"
+# model = "resnet50"
+# model = "resnet101"
+# model = "resnet152"
 
