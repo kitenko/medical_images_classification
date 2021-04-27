@@ -1,7 +1,8 @@
 from typing import Tuple, Optional
 
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Conv2D, BatchNormalization, GlobalAveragePooling2D, Input, Activation, Add
+from tensorflow.keras.layers import (Dense, Conv2D, BatchNormalization, GlobalAveragePooling2D, Input, Activation, Add,
+                                     MaxPool2D)
 
 
 class CustomResNetModel:
@@ -20,15 +21,18 @@ class CustomResNetModel:
         :return:
         """
         inp = Input(shape=self._input_shape)
-        conv2d = Conv2D(filters=16, kernel_size=(3, 3), strides=2, padding="same", use_bias=False)(inp)
+        conv2d = Conv2D(filters=64, kernel_size=(7, 7), strides=2, padding='same', use_bias=False)(inp)
         batch_normalization = BatchNormalization()(conv2d)
         activation = Activation('relu')(batch_normalization)
-        conv2d_1 = Conv2D(filters=16, kernel_size=(3, 3), strides=1, padding="same", use_bias=False)(activation)
+        #
+        maxpool2d = MaxPool2D(pool_size=(3, 3), strides=2, padding='same')(activation)
+        #
+        conv2d_1 = Conv2D(filters=64, kernel_size=(3, 3), strides=1, padding="same", use_bias=False)(maxpool2d)
         batch_normalization_1 = BatchNormalization()(conv2d_1)
         activation_1 = Activation('relu')(batch_normalization_1)
-        conv2d_2 = Conv2D(filters=16, kernel_size=(3, 3), strides=1, padding="same", use_bias=False)(activation_1)
+        conv2d_2 = Conv2D(filters=64, kernel_size=(3, 3), strides=1, padding="same", use_bias=False)(activation_1)
         batch_normalization_2 = BatchNormalization()(conv2d_2)
-        add = Add()([activation, batch_normalization_2])
+        add = Add()([maxpool2d, batch_normalization_2])
         #
         activation_2 = Activation('relu')(add)
         conv2d_2_1 = Conv2D(filters=32, kernel_size=(3, 3), strides=2, padding="same", use_bias=False)(activation_2)
