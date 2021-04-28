@@ -97,3 +97,4 @@ def train(dataset_path_json: str, save_path: str) -> None:
 
 if __name__ == '__main__':
     train(JSON_FILE_PATH, LOGS_DIR)
+
