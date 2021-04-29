@@ -3,14 +3,14 @@ import os
 import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping
 
-import config
+devices = tf.config.experimental.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(devices[0], True)
+
 from data_generator import DataGenerator
-# from custom_model import ClassificationPathologies
-from resnet_github_tensorflow.resnet import resnet_18, resnet_34, resnet_101, resnet_152
-# from resnet_model import CustomResNetModel
 from metrics import Recall, Precision, F1Score
-from config import (NUMBER_OF_CLASSES, LOGS_DIR, INPUT_SHAPE, EPOCHS, JSON_FILE_PATH,
-                    PATH_FOR_SAVE_LOGS_SCALAR)
+from config import NUMBER_OF_CLASSES, LOGS_DIR, EPOCHS, JSON_FILE_PATH
+from classification_model_git import CustomModelGit
+from logcallback import LogCallback
 
 # run gpu
 devices = tf.config.experimental.list_physical_devices('GPU')
@@ -21,36 +21,16 @@ def lr_schedule(epoch):
     """
     Returns a custom learning rate that decreases as epochs progress.
     """
-    learning_rate = 0.01
+    learning_rate = 0.005
     if epoch > 10:
         learning_rate = 0.001
     if epoch > 20:
         learning_rate = 0.0001
-    if epoch > 50:
+    if epoch > 40:
         learning_rate = 0.00001
 
     tf.summary.scalar('learning rate', data=learning_rate, step=epoch)
     return learning_rate
-
-
-def get_model():
-    """
-    This function returns model.
-
-    :return: return model
-    """
-    if config.model == "resnet18":
-        model = resnet_18()
-    if config.model == "resnet34":
-        model = resnet_34()
-    if config.model == "resnet101":
-        model = resnet_101()
-    if config.model == "resnet152":
-        model = resnet_152()
-
-    model.build(input_shape=INPUT_SHAPE)
-    model.summary()
-    return model
 
 
 def train(dataset_path_json: str, save_path: str) -> None:
@@ -66,7 +46,7 @@ def train(dataset_path_json: str, save_path: str) -> None:
     train_data_gen = DataGenerator(dataset_path_json, is_train=True)
     test_data_gen = DataGenerator(dataset_path_json, is_train=False)
 
-    model = get_model()
+    model = CustomModelGit().build()
     model.compile(loss=tf.keras.losses.categorical_crossentropy, optimizer=tf.keras.optimizers.Adam(),
                   metrics=['accuracy', Recall(NUMBER_OF_CLASSES), Precision(NUMBER_OF_CLASSES),
                            F1Score(NUMBER_OF_CLASSES)])
@@ -80,21 +60,11 @@ def train(dataset_path_json: str, save_path: str) -> None:
                                                                     mode='max',
                                                                     save_best_only=True
                                                                    )
-    callbacks = [tf.keras.callbacks.TensorBoard(log_dir=PATH_FOR_SAVE_LOGS_SCALAR,
-                                                histogram_freq=0,
-                                                write_graph=False,
-                                                write_images=False,
-                                                update_freq='epoch',
-                                                profile_batch=2,
-                                                embeddings_freq=1)]
-
-    model.fit_generator(generator=train_data_gen, validation_data=test_data_gen, validation_freq=1,
-                        validation_steps=len(test_data_gen), epochs=EPOCHS,
-                        callbacks=[model_checkpoint_callback, early, callbacks], workers=8)
-
-    #model.save('resnet_model_git', save_format='tf')
+    with LogCallback() as call_back:
+        model.fit_generator(generator=train_data_gen, validation_data=test_data_gen, validation_freq=1,
+                            validation_steps=len(test_data_gen), epochs=EPOCHS,
+                            callbacks=[call_back, early], workers=8)
 
 
 if __name__ == '__main__':
     train(JSON_FILE_PATH, LOGS_DIR)
-
