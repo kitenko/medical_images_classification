@@ -11,21 +11,19 @@ DATASET_PATH_z_line = os.path.join(DATASET_PATH, 'z-line')
 DATASET_PATH_bbps_0_1 = os.path.join(DATASET_PATH, 'bbps-0-1')
 DATASET_PATH_pylorus = os.path.join(DATASET_PATH, 'pylorus')
 JSON_FILE_PATH = os.path.join(DATASET_PATH, 'data.json')
-LOGS_DIR = os.path.join(DATASET_PATH, 'logs_dir')
-MAKE_PATH_FOR_SAVE_LOGS_SCALAR = os.makedirs(LOGS_DIR + '/resnet_101_logs', exist_ok=True)
-PATH_FOR_SAVE_LOGS_SCALAR = os.path.join(LOGS_DIR, 'resnet_101_logs')
+# create logs_dir
+MAKE_LOGS_DIR = os.makedirs('logs_dir/resnet50_weights_imagenet', exist_ok=True)
+LOGS_DIR = 'logs_dir/resnet50_weights_imagenet'
+MAKE_DIR_FOR_MODEL_SAVE = os.makedirs('save_models/resnet50_weights_imagenet', exist_ok=True)
+SAVE_MODELS = 'save_models/resnet50_weights_imagenet'
+
 CLASS_NAMES = ('cecum', 'dyed-lifted-polyps', 'dyed-resection-margins', 'retroflex-stomach', 'bbps-2-3', 'polyps',
                'z-line', 'bbps-0-1', 'pylorus')
 BATCH_SIZE = 8
 NUMBER_OF_CLASSES = 9
-INPUT_SHAPE = (None, 224, 224, 3)
+INPUT_SHAPE = (224, 224, 3)
 LEARNING_RATE = 0.0001
-EPOCHS = 120
+EPOCHS = 150
+WEIGHTS = 'imagenet'
 
-# choose a network
-# model = "resnet18"
-# model = "resnet34"
-# model = "resnet50"
-model = "resnet101"
-# model = "resnet152"
-
+NAME_MODEL = 'resnet50'
