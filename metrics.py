@@ -1,9 +1,16 @@
 import tensorflow as tf
+
 from abc import abstractmethod
 
 
 class Metric:
     def __init__(self, num_classes, is_binary_cross_entropy=False):
+        """
+        Metrics are counted (Recall, Precision, F1Score).
+
+        :param num_classes: number of classes in the dataset.
+        :param is_binary_cross_entropy: If there are no more than two classes, the value is set to True.
+        """
         self.num_classes = num_classes
         self.epsilon = 1e-6
         self.is_binary_cross_entropy = is_binary_cross_entropy
@@ -13,6 +20,13 @@ class Metric:
             raise ValueError(msg)
 
     def confusion_matrix(self, y_true, y_pred):
+        """
+        This functions counts confusion_matrix.
+
+        :param y_true: This is the true mark of validation data.
+        :param y_pred: This is the predict mark of validation data.
+        :return: False Positive, False Negative, True Positive.
+        """
         if self.is_binary_cross_entropy:
             y_true = tf.cast(y_true > 0.5, tf.float32)[:, 0]
             y_pred = tf.cast(y_pred > 0.5, tf.float32)[:, 0]
