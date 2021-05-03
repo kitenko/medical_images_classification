@@ -1,21 +1,19 @@
 import os
 import json
-# import math
 from typing import Tuple
 
 import cv2
-import keras
+from tensorflow import keras
 import numpy as np
 import albumentations as A
 import matplotlib.pyplot as plt
 
-from config import JSON_FILE_PATH, CLASS_NAMES, NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE
+from config import JSON_FILE_PATH, NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE
 
 
 class DataGenerator(keras.utils.Sequence):
     def __init__(self, json_path: str = JSON_FILE_PATH, batch_size: int = BATCH_SIZE, is_train: bool = True,
-                 image_shape: Tuple[int, int, int] = (224, 224, 3), num_classes: int = NUMBER_OF_CLASSES,
-                 class_names: Tuple[str, str, str, str, str] = CLASS_NAMES) -> None:
+                 image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES) -> None:
         """
         Data generator for the task of colour images classifying.
 
@@ -24,13 +22,11 @@ class DataGenerator(keras.utils.Sequence):
         :param is_train: if is_train = True, then we work with train images, otherwise with test.
         :param image_shape: this is image shape (height, width, channels).
         :param num_classes: number of image classes.
-        :param class_names: label names, for example: "red", "green".
         """
         self.batch_size = batch_size
         self.is_train = is_train
         self.image_shape = image_shape
         self.num_classes = num_classes
-        self.class_names = class_names
 
         # read json
         with open(json_path) as f:
@@ -100,26 +96,7 @@ class DataGenerator(keras.utils.Sequence):
             img = self.aug(image=img)
             img = img['image']
             images[i, :, :, :] = img
-            if class_name == 'cecum':
-                labels[i, 0] = 1
-            elif class_name == 'dyed-lifted-polyps':
-                labels[i, 1] = 1
-            elif class_name == 'dyed-resection-margins':
-                labels[i, 2] = 1
-            elif class_name == 'retroflex-stomach':
-                labels[i, 3] = 1
-            elif class_name == 'bbps-2-3':
-                labels[i, 4] = 1
-            elif class_name == 'polyps':
-                labels[i, 5] = 1
-            elif class_name == 'z-line':
-                labels[i, 6] = 1
-            elif class_name == 'bbps-0-1':
-                labels[i, 7] = 1
-            elif class_name == 'pylorus':
-                labels[i, 8] = 1
-            else:
-                raise ValueError('no label for image')
+            labels[i, class_name['index']] = 1
         images = image_normalization(images)
         return images, labels
 
@@ -137,24 +114,7 @@ class DataGenerator(keras.utils.Sequence):
         batch = self.data[(batch_idx * self.batch_size):((batch_idx + 1) * self.batch_size)]
         plt.figure(figsize=(20, 20))
         for i, data_dict in enumerate(batch):
-            if data_dict[1] == 'cecum':
-                class_name = self.class_names[0]
-            elif data_dict[1] == 'dyed-lifted-polyps':
-                class_name = self.class_names[1]
-            elif data_dict[1] == 'dyed-resection-margins':
-                class_name = self.class_names[2]
-            elif data_dict[1] == 'retroflex-stomach':
-                class_name = self.class_names[3]
-            elif data_dict[1] == 'bbps-2-3':
-                class_name = self.class_names[4]
-            elif data_dict[1] == 'polyps':
-                class_name = self.class_names[5]
-            elif data_dict[1] == 'z-line':
-                class_name = self.class_names[6]
-            elif data_dict[1] == 'bbps-0-1':
-                class_name = self.class_names[7]
-            else:
-                class_name = self.class_names[8]
+            class_name = data_dict[1]['class_name']
             image = cv2.cvtColor(cv2.imread(os.path.join(data_dict[0])), cv2.COLOR_BGR2RGB)
             image_copy = image
             image_augmented = self.aug(image=image_copy)
@@ -179,5 +139,4 @@ def image_normalization(image: np.ndarray) -> np.ndarray:
 
 
 if __name__ == '__main__':
-    x = DataGenerator(JSON_FILE_PATH, BATCH_SIZE, True, INPUT_SHAPE, NUMBER_OF_CLASSES, CLASS_NAMES)
-    x.show(86)
+    x = DataGenerator(JSON_FILE_PATH, BATCH_SIZE, True, INPUT_SHAPE, NUMBER_OF_CLASSES)
