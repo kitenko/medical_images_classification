@@ -3,18 +3,15 @@ import os
 import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping
 
-devices = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(devices[0], True)
-
 from data_generator import DataGenerator
 from metrics import Recall, Precision, F1Score
-from config import NUMBER_OF_CLASSES, LOGS_DIR, EPOCHS, JSON_FILE_PATH
+from config import NUMBER_OF_CLASSES, LOGS_DIR, EPOCHS, JSON_FILE_PATH, LEARNING_RATE, TENSORBOARD_LOGS
 from classification_model_git import CustomModelGit
 from logcallback import LogCallback
+from creating_directories import create_dirs
 
-# run gpu
-devices = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(devices[0], True)
+# create dirs for save logs and models
+create_dirs()
 
 
 def lr_schedule(epoch):
@@ -53,18 +50,22 @@ def train(dataset_path_json: str, save_path: str) -> None:
     model.summary()
 
     early = EarlyStopping(monitor='loss', min_delta=0, patience=7, verbose=1, mode='auto')
-    checkpoint_filepath = os.path.join(log_dir, 'model.h5')
+    checkpoint_filepath = os.path.join(log_dir, 'model_mobilenetv2.h5')
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
-                                                                    filepath=checkpoint_filepath,
-                                                                    monitor='val_accuracy',
-                                                                    mode='max',
-                                                                    save_best_only=True
-                                                                   )
+        filepath=checkpoint_filepath,
+        monitor='F1_score',
+        mode='max',
+        save_best_only=True
+    )
+    tensor_board = tf.keras.callbacks.TensorBoard(TENSORBOARD_LOGS, update_freq='batch')
     with LogCallback() as call_back:
         model.fit_generator(generator=train_data_gen, validation_data=test_data_gen, validation_freq=1,
                             validation_steps=len(test_data_gen), epochs=EPOCHS,
-                            callbacks=[call_back, early], workers=8)
+                            callbacks=[call_back, early, model_checkpoint_callback, tensor_board], workers=8)
 
 
 if __name__ == '__main__':
+    devices = tf.config.experimental.list_physical_devices('GPU')
+    tf.config.experimental.set_memory_growth(devices[0], True)
+
     train(JSON_FILE_PATH, LOGS_DIR)
