@@ -1,6 +1,6 @@
 import tensorflow as tf
 from config import NUMBER_OF_CLASSES
-from resnet_github_tensorflow.residual_block import make_basic_block_layer, make_bottleneck_layer
+from CNN_MODELS.resnet_github_tensorflow.residual_block import make_basic_block_layer, make_bottleneck_layer
 
 
 class ResNetTypeI(tf.keras.Model):
