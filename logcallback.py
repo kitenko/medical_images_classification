@@ -3,7 +3,7 @@ import json
 
 from tensorflow import keras
 
-from config import LOGS_DIR, SAVE_MODELS
+from config import LOGS_DIR_CURRENT_MODEL, SAVE_CURRENT_MODEL
 
 
 class LogCallback(keras.callbacks.Callback):
@@ -14,7 +14,7 @@ class LogCallback(keras.callbacks.Callback):
     :param model_save_path: путь к папке, в которую сохранять модели.
     :param logs_save_path: путь к папке, в которую сохранять логи.
     """
-    def __init__(self, model_save_path: str = SAVE_MODELS, logs_save_path: str = LOGS_DIR):
+    def __init__(self, model_save_path: str = SAVE_CURRENT_MODEL, logs_save_path: str = LOGS_DIR_CURRENT_MODEL):
         super().__init__()
         self.model_save_path = model_save_path
         self.log_file = os.path.join(logs_save_path, 'train_logs.json')
@@ -25,7 +25,7 @@ class LogCallback(keras.callbacks.Callback):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.save_logs()
-        self.model.save(os.path.join(self.model_save_path, 'last.h5'))
+        # self.model.save(os.path.join(self.model_save_path, 'last.h5'))
 
     def save_logs(self):
         with open(self.log_file, 'w') as file:
