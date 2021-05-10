@@ -11,15 +11,15 @@ LEARNING_RATE = 0.0001
 EPOCHS = 150
 WEIGHTS = None
 
-NAME_MODEL = 'nasnetmobile'
+NAME_MODEL = 'EfficientNetB1'
 
 TENSORBOARD_LOGS = 'tensorboard_logs'
 LOGS_DIR = 'logs_dir'
 SAVE_MODELS = 'save_models'
 
 if WEIGHTS == None:
-    LOGS_DIR_CURRENT_MODEL = os.path.join(LOGS_DIR, NAME_MODEL + '_no')
-    SAVE_CURRENT_MODEL = os.path.join(SAVE_MODELS, NAME_MODEL + '_no')
+    LOGS_DIR_CURRENT_MODEL = os.path.join(LOGS_DIR, NAME_MODEL + '_no_weights')
+    SAVE_CURRENT_MODEL = os.path.join(SAVE_MODELS, NAME_MODEL + '_no_weights')
 else:
     LOGS_DIR_CURRENT_MODEL = os.path.join(LOGS_DIR, NAME_MODEL + WEIGHTS)
     SAVE_CURRENT_MODEL = os.path.join(SAVE_MODELS, NAME_MODEL + WEIGHTS)
