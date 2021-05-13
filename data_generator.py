@@ -105,14 +105,20 @@ class DataGenerator(keras.utils.Sequence):
         plt.close()
 
 
-def augmentation_images(train_data: bool = False):
+def augmentation_images(train_data: bool = False) -> A.Compose:
+    """
+    This function makes augmentation data.
+
+    :param train_data: if this parameter is True then augmentation is applied to train dataset.
+    :return: augment data
+    """
     if train_data is True:
         aug = A.Compose([
               A.Resize(height=INPUT_SHAPE[0], width=INPUT_SHAPE[1]),
               A.Blur(blur_limit=(1, 4), p=0.2),
-              A.CLAHE(clip_limit=(1.0, 3.0), tile_grid_size=(8, 8), p=0.2),    # контраст
+              A.CLAHE(clip_limit=(1.0, 3.0), tile_grid_size=(8, 8), p=0.2),
               A.ColorJitter(brightness=0.1, contrast=0.0, saturation=0.1, hue=0.0, p=0.2),
-              A.Equalize(mode='cv', by_channels=True, mask=None, p=0.1),    # выравнивание гистрограммы
+              A.Equalize(mode='cv', by_channels=True, mask=None, p=0.1),
               A.Flip(p=0.4),
               A.Rotate(limit=320, interpolation=1, border_mode=4, value=None, mask_value=None, always_apply=False,
                        p=0.2)
@@ -134,3 +140,4 @@ def image_normalization(image: np.ndarray) -> np.ndarray:
 
 if __name__ == '__main__':
     x = DataGenerator(JSON_FILE_PATH, BATCH_SIZE, True, INPUT_SHAPE, NUMBER_OF_CLASSES)
+    x.show(2)
