@@ -1,21 +1,15 @@
 import os
-
-from config import NAME_MODEL, WEIGHTS, LOGS_DIR, SAVE_MODELS, TENSORBOARD_LOGS
+from config import (MODELS_DATA, SAVE_MODELS, TENSORBOARD_LOGS, SAVE_CURRENT_MODEL, LOGS_DIR_CURRENT_MODEL,
+                    SAVE_CURRENT_TENSORBOARD_LOGS)
 
 
 def create_dirs():
     os.makedirs(TENSORBOARD_LOGS, exist_ok=True)
-    os.makedirs(LOGS_DIR, exist_ok=True)
+    os.makedirs(MODELS_DATA, exist_ok=True)
     os.makedirs(SAVE_MODELS, exist_ok=True)
-
-    try:
-        os.makedirs(LOGS_DIR + '/' + NAME_MODEL + WEIGHTS, exist_ok=True)
-    except TypeError:
-        os.makedirs(LOGS_DIR + '/' + NAME_MODEL + '_no', exist_ok=True)
-    try:
-        os.makedirs(SAVE_MODELS + '/' + NAME_MODEL + WEIGHTS, exist_ok=True)
-    except TypeError:
-        os.makedirs(SAVE_MODELS + '/' + NAME_MODEL+'no', exist_ok=True)
+    os.makedirs(SAVE_CURRENT_MODEL, exist_ok=True)
+    os.makedirs(LOGS_DIR_CURRENT_MODEL, exist_ok=True)
+    os.makedirs(SAVE_CURRENT_TENSORBOARD_LOGS, exist_ok=True)
 
 
 if __name__ == '__main__':
