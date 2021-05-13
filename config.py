@@ -1,25 +1,28 @@
 import os
+from datetime import datetime
+
+date_time_for_save = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 DATASET_PATH = 'data'
 DATASET_PATH_IMAGES = os.path.join(DATASET_PATH, 'images')
 JSON_FILE_PATH = os.path.join(DATASET_PATH, 'data.json')
 
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 NUMBER_OF_CLASSES = 9
-INPUT_SHAPE = (224, 224, 3)
+INPUT_SHAPE = (240, 240, 3)
 LEARNING_RATE = 0.0001
 EPOCHS = 150
-WEIGHTS = None
+WEIGHTS = 'imagenet'
+AUGMENTATION_DATA = True
 
 NAME_MODEL = 'EfficientNetB1'
 
-TENSORBOARD_LOGS = 'tensorboard_logs'
-LOGS_DIR = 'logs_dir'
-SAVE_MODELS = 'save_models'
+MODELS_DATA = 'models_data'
+TENSORBOARD_LOGS = os.path.join(MODELS_DATA, 'tensorboard_logs')
+SAVE_MODELS = os.path.join(MODELS_DATA, 'save_models')
+LOGS = os.path.join(MODELS_DATA, 'logs')
 
-if WEIGHTS == None:
-    LOGS_DIR_CURRENT_MODEL = os.path.join(LOGS_DIR, NAME_MODEL + '_no_weights')
-    SAVE_CURRENT_MODEL = os.path.join(SAVE_MODELS, NAME_MODEL + '_no_weights')
-else:
-    LOGS_DIR_CURRENT_MODEL = os.path.join(LOGS_DIR, NAME_MODEL + WEIGHTS)
-    SAVE_CURRENT_MODEL = os.path.join(SAVE_MODELS, NAME_MODEL + WEIGHTS)
+LOGS_DIR_CURRENT_MODEL = os.path.join(LOGS, NAME_MODEL + '_' + str(WEIGHTS) + '_' + date_time_for_save)
+SAVE_CURRENT_MODEL = os.path.join(SAVE_MODELS, NAME_MODEL + '_' + str(WEIGHTS) + '_' + date_time_for_save)
+SAVE_CURRENT_TENSORBOARD_LOGS = os.path.join(TENSORBOARD_LOGS, NAME_MODEL + '_' + str(WEIGHTS) + '_' +
+                                             date_time_for_save)
