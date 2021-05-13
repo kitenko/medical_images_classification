@@ -3,7 +3,7 @@ import json
 import matplotlib.pyplot as plt
 
 
-class Graf():
+class Graf:
     def __init__(self, path_for_json_file_logs: str, graf_loss: bool = True, graf_accuracy: bool = True,
                  graf_recall: bool = True, graf_precision: bool = True, graf_f1score: bool = True) -> None:
         """
