@@ -8,11 +8,10 @@ from config import LOGS_DIR_CURRENT_MODEL, SAVE_CURRENT_MODEL
 
 class LogCallback(keras.callbacks.Callback):
     """
-    Логирование всех метрик обучения в json файл и сохранение модели каждую эпоху.
-    Использовать в виде контекст-менеджера.
+    Logging all training metrics to a json file and saving the model every epoch.
 
-    :param model_save_path: путь к папке, в которую сохранять модели.
-    :param logs_save_path: путь к папке, в которую сохранять логи.
+    :param model_save_path: path to the folder in which to save the models.
+    :param logs_save_path: path to the folder in which to save the logs.
     """
     def __init__(self, model_save_path: str = SAVE_CURRENT_MODEL, logs_save_path: str = LOGS_DIR_CURRENT_MODEL):
         super().__init__()
