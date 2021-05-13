@@ -8,12 +8,13 @@ import numpy as np
 import albumentations as A
 import matplotlib.pyplot as plt
 
-from config import JSON_FILE_PATH, NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE
+from config import JSON_FILE_PATH, NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, AUGMENTATION_DATA
 
 
 class DataGenerator(keras.utils.Sequence):
     def __init__(self, json_path: str = JSON_FILE_PATH, batch_size: int = BATCH_SIZE, is_train: bool = True,
-                 image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES) -> None:
+                 image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES,
+                 augmentation_data: bool = AUGMENTATION_DATA) -> None:
         """
         Data generator for the task of colour images classifying.
 
@@ -22,11 +23,13 @@ class DataGenerator(keras.utils.Sequence):
         :param is_train: if is_train = True, then we work with train images, otherwise with test.
         :param image_shape: this is image shape (height, width, channels).
         :param num_classes: number of image classes.
+        :param augmentation_data: if this parameter is True, then augmentation is applied to the training dataset.
         """
         self.batch_size = batch_size
         self.is_train = is_train
         self.image_shape = image_shape
         self.num_classes = num_classes
+        self.augmentation_data = augmentation_data
 
         # read json
         with open(json_path) as f:
@@ -34,39 +37,12 @@ class DataGenerator(keras.utils.Sequence):
 
         if is_train:
             self.data = self.data['train']
-            augmentations = A.Compose([
-                    A.Resize(height=self.image_shape[0], width=self.image_shape[1]),
-                    A.RandomRotate90(),
-                    A.Flip(),
-                    A.Transpose(),
-                    A.OneOf([
-                        A.IAAAdditiveGaussianNoise(),
-                        A.GaussNoise(),
-                    ], p=0.2),
-                    A.OneOf([
-                        A.MotionBlur(p=.2),
-                        A.MedianBlur(blur_limit=3, p=0.1),
-                        A.Blur(blur_limit=3, p=0.1),
-                    ], p=0.2),
-                    A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.2),
-                    A.OneOf([
-                        A.OpticalDistortion(p=0.3),
-                        A.GridDistortion(p=.1),
-                        A.IAAPiecewiseAffine(p=0.3),
-                    ], p=0.2),
-                    A.OneOf([
-                        A.CLAHE(clip_limit=2),
-                        A.IAASharpen(),
-                        A.IAAEmboss(),
-                        A.RandomBrightnessContrast(),
-                    ], p=0.3),
-                    A.HueSaturationValue(p=0.3)
-                    ])
+            augmentation = augmentation_images(train_data=self.augmentation_data)
         else:
             self.data = self.data['test']
-            augmentations = A.Compose([A.Resize(height=self.image_shape[0], width=self.image_shape[1])])
+            augmentation = augmentation_images(train_data=False)
 
-        self.aug = augmentations
+        self.aug = augmentation
         self.data = list(self.data.items())
         self.on_epoch_end()
 
@@ -127,6 +103,24 @@ class DataGenerator(keras.utils.Sequence):
             plt.close('all')
             raise SystemExit
         plt.close()
+
+
+def augmentation_images(train_data: bool = False):
+    if train_data is True:
+        aug = A.Compose([
+              A.Resize(height=INPUT_SHAPE[0], width=INPUT_SHAPE[1]),
+              A.Blur(blur_limit=(1, 4), p=0.2),
+              A.CLAHE(clip_limit=(1.0, 3.0), tile_grid_size=(8, 8), p=0.2),    # контраст
+              A.ColorJitter(brightness=0.1, contrast=0.0, saturation=0.1, hue=0.0, p=0.2),
+              A.Equalize(mode='cv', by_channels=True, mask=None, p=0.1),    # выравнивание гистрограммы
+              A.Flip(p=0.4),
+              A.Rotate(limit=320, interpolation=1, border_mode=4, value=None, mask_value=None, always_apply=False,
+                       p=0.2)
+              ])
+    else:
+        aug = A.Compose([A.Resize(height=INPUT_SHAPE[0], width=INPUT_SHAPE[1])])
+
+    return aug
 
 
 def image_normalization(image: np.ndarray) -> np.ndarray:
