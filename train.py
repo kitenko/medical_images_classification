@@ -7,7 +7,7 @@ from data_generator import DataGenerator
 from metrics import Recall, Precision, F1Score
 from classification_model_git import build_model
 from logcallback import LogCallback
-from config import (NUMBER_OF_CLASSES, EPOCHS, JSON_FILE_PATH, LEARNING_RATE, NAME_MODEL, SAVE_CURRENT_MODEL,
+from config import (NUMBER_OF_CLASSES, EPOCHS, JSON_FILE_PATH, LEARNING_RATE, MODEL_NAME, SAVE_CURRENT_MODEL,
                     SAVE_CURRENT_TENSORBOARD_LOGS, TENSORBOARD_LOGS, MODELS_DATA, SAVE_MODELS, LOGS_DIR_CURRENT_MODEL)
 
 
@@ -18,12 +18,9 @@ def train(dataset_path_json: str) -> None:
     :param dataset_path_json: path to json file.
     """
     # creating directories
-    os.makedirs(TENSORBOARD_LOGS, exist_ok=True)
-    os.makedirs(MODELS_DATA, exist_ok=True)
-    os.makedirs(SAVE_MODELS, exist_ok=True)
-    os.makedirs(SAVE_CURRENT_MODEL, exist_ok=True)
-    os.makedirs(LOGS_DIR_CURRENT_MODEL, exist_ok=True)
-    os.makedirs(SAVE_CURRENT_TENSORBOARD_LOGS, exist_ok=True)
+    for p in [TENSORBOARD_LOGS, MODELS_DATA, SAVE_MODELS, SAVE_CURRENT_MODEL, LOGS_DIR_CURRENT_MODEL,
+              SAVE_CURRENT_TENSORBOARD_LOGS]:
+        os.makedirs(p, exist_ok=True)
 
     train_data_gen = DataGenerator(dataset_path_json, is_train=True)
     test_data_gen = DataGenerator(dataset_path_json, is_train=False)
@@ -35,7 +32,7 @@ def train(dataset_path_json: str) -> None:
     model.summary()
 
     early = EarlyStopping(monitor='loss', min_delta=0, patience=7, verbose=1, mode='auto')
-    checkpoint_filepath = os.path.join(SAVE_CURRENT_MODEL, NAME_MODEL+'.h5')
+    checkpoint_filepath = os.path.join(SAVE_CURRENT_MODEL, MODEL_NAME + '.h5')
     model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_filepath,
         monitor='F1_score',
