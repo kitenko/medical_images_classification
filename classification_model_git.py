@@ -4,11 +4,11 @@ import tensorflow as tf
 import efficientnet.tfkeras as efn
 from classification_models.tfkeras import Classifiers
 
-from config import NAME_MODEL, INPUT_SHAPE, NUMBER_OF_CLASSES, WEIGHTS
+from config import MODEL_NAME, INPUT_SHAPE, NUMBER_OF_CLASSES, WEIGHTS
 
 
 def build_model(input_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES,
-                name_model: str = NAME_MODEL, weights: str = WEIGHTS) -> tf.keras.models.Model:
+                name_model: str = MODEL_NAME, weights: str = WEIGHTS) -> tf.keras.models.Model:
     """
     This function creates a model from 'classification_models.tf.keras' or 'efficientnet.tf.keras' library depending on
     the input parameters.
@@ -19,28 +19,29 @@ def build_model(input_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: in
     :param weights: ImageNet or None.
     :return: tf.keras.models.Model
     """
+    models_dict = {
+        'EfficientNetB0': efn.EfficientNetB0,
+        'EfficientNetB1': efn.EfficientNetB1,
+        'EfficientNetB2': efn.EfficientNetB2,
+        'EfficientNetB3': efn.EfficientNetB3,
+        'EfficientNetB4': efn.EfficientNetB4,
+        'EfficientNetB5': efn.EfficientNetB5,
+        'EfficientNetB6': efn.EfficientNetB6,
+        'EfficientNetB7': efn.EfficientNetB7,
+        'EfficientNetL2': efn.EfficientNetL2
+    }
 
-    if NAME_MODEL[:-2].lower() != 'efficientnet':
-        name_model, preprocess_input = Classifiers.get(name_model)
-        base_model = name_model(input_shape=input_shape, weights=weights, include_top=False)
-    elif name_model == 'EfficientNetB0':
-        base_model = efn.EfficientNetB0(input_shape=input_shape, weights=weights, include_top=False)
-    elif name_model == 'EfficientNetB1':
-        base_model = efn.EfficientNetB1(input_shape=input_shape, weights=weights, include_top=False)
-    elif name_model == 'EfficientNetB2':
-        base_model = efn.EfficientNetB2(input_shape=input_shape, weights=weights, include_top=False)
-    elif name_model == 'EfficientNetB3':
-        base_model = efn.EfficientNetB3(input_shape=input_shape, weights=weights, include_top=False)
-    elif name_model == 'EfficientNetB4':
-        base_model = efn.EfficientNetB4(input_shape=input_shape, weights=weights, include_top=False)
-    elif name_model == 'EfficientNetB5':
-        base_model = efn.EfficientNetB5(input_shape=input_shape, weights=weights, include_top=False)
-    elif name_model == 'EfficientNetB6':
-        base_model = efn.EfficientNetB6(input_shape=input_shape, weights=weights, include_top=False)
-    elif name_model == 'EfficientNetB7':
-        base_model = efn.EfficientNetB7(input_shape=input_shape, weights=weights, include_top=False)
+    if MODEL_NAME[:-2].lower() != 'efficientnet':
+        try:
+            name_model, preprocess_input = Classifiers.get(name_model)
+            base_model = name_model(input_shape=input_shape, weights=weights, include_top=False)
+        except ValueError:
+            print('the model name is incorrect, please check the model name')
     else:
-        base_model = efn.EfficientNetL2(input_shape=input_shape, weights=weights, include_top=False)
+        try:
+            base_model = models_dict[name_model](input_shape=input_shape, weights=weights, include_top=False)
+        except ValueError:
+            print('the model name is incorrect, please check the model name')
 
     x = tf.keras.layers.GlobalAveragePooling2D()(base_model.output)
     output = tf.keras.layers.Dense(num_classes, activation='softmax')(x)
