@@ -1,4 +1,3 @@
-import os
 import json
 from typing import Tuple
 
@@ -8,13 +7,13 @@ import numpy as np
 import albumentations as A
 import matplotlib.pyplot as plt
 
-from config import JSON_FILE_PATH, NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, AUGMENTATION_DATA
+from config import JSON_FILE_PATH, NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, USE_AUGMENTATION
 
 
 class DataGenerator(keras.utils.Sequence):
     def __init__(self, json_path: str = JSON_FILE_PATH, batch_size: int = BATCH_SIZE, is_train: bool = True,
                  image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES,
-                 augmentation_data: bool = AUGMENTATION_DATA) -> None:
+                 augmentation_data: bool = USE_AUGMENTATION) -> None:
         """
         Data generator for the task of colour images classifying.
 
@@ -33,17 +32,17 @@ class DataGenerator(keras.utils.Sequence):
 
         # read json
         with open(json_path) as f:
-            self.data = json.load(f)
+            data = json.load(f)
 
         if is_train:
-            self.data = self.data['train']
-            augmentation = augmentation_images(train_data=self.augmentation_data)
+            data = data['train']
+            augmentation = images_augmentation(train_data=self.augmentation_data)
         else:
-            self.data = self.data['test']
-            augmentation = augmentation_images(train_data=False)
+            data = data['test']
+            augmentation = images_augmentation(train_data=False)
 
         self.aug = augmentation
-        self.data = list(self.data.items())
+        self.data = list(data.items())
         self.on_epoch_end()
 
     def on_epoch_end(self) -> None:
@@ -76,36 +75,36 @@ class DataGenerator(keras.utils.Sequence):
         images = image_normalization(images)
         return images, labels
 
-    def show(self, batch_idx: int) -> None:
+    def show(self, batch: Tuple[np.ndarray, np.ndarray], train_data: bool = USE_AUGMENTATION) -> None:
         """
         This method showing image with label.
 
-        :param batch_idx: batch number.
+        :param batch: this is input batch from __getitem__.
+        :param train_data: if this parameter is True then augmentation is applied to train dataset.
         """
+        images, labels = batch[0], batch[1]
+
         rows_columns_subplot = self.batch_size
         while np.math.sqrt(rows_columns_subplot) - int(np.math.sqrt(rows_columns_subplot)) != 0.0:
             rows_columns_subplot += 1
         rows_columns_subplot = int(np.math.sqrt(rows_columns_subplot))
 
-        batch = self.data[(batch_idx * self.batch_size):((batch_idx + 1) * self.batch_size)]
-        plt.figure(figsize=(20, 20))
-        for i, data_dict in enumerate(batch):
-            class_name = data_dict[1]['class_name']
-            image = cv2.cvtColor(cv2.imread(os.path.join(data_dict[0])), cv2.COLOR_BGR2RGB)
-            image_copy = image
-            image_augmented = self.aug(image=image_copy)
+        plt.figure(figsize=[20, 20])
+        for i, j in enumerate(images):
+            lable_image = np.where(labels[i] == 1)
             plt.subplot(rows_columns_subplot, rows_columns_subplot, i+1)
-            plt.imshow(image)
-            plt.title('Original, class = "{}"'.format(class_name))
-            plt.imshow(image_augmented['image'])
-            plt.title('Augmented, class = "{}"'.format(class_name))
+            plt.imshow(j)
+            if train_data is True:
+                plt.title('Augmented, class = "{}"'.format(lable_image))
+            else:
+                plt.title('Original, class = "{}"'.format(lable_image))
         if plt.waitforbuttonpress(0):
             plt.close('all')
             raise SystemExit
         plt.close()
 
 
-def augmentation_images(train_data: bool = False) -> A.Compose:
+def images_augmentation(train_data: bool = USE_AUGMENTATION) -> A.Compose:
     """
     This function makes augmentation data.
 
@@ -139,5 +138,6 @@ def image_normalization(image: np.ndarray) -> np.ndarray:
 
 
 if __name__ == '__main__':
-    x = DataGenerator(JSON_FILE_PATH, BATCH_SIZE, True, INPUT_SHAPE, NUMBER_OF_CLASSES)
-    x.show(2)
+    x = DataGenerator()
+    for i in range(len(x)):
+        x.show(x[i])
