@@ -2,12 +2,15 @@ import json
 
 import matplotlib.pyplot as plt
 
+from config import LOGS_DIR_CURRENT_MODEL
 
-class Graf:
-    def __init__(self, path_for_json_file_logs: str, graf_loss: bool = True, graf_accuracy: bool = True,
-                 graf_recall: bool = True, graf_precision: bool = True, graf_f1score: bool = True) -> None:
+
+class GraphingMetrics:
+    def __init__(self, path_for_json_file_logs: str = LOGS_DIR_CURRENT_MODEL, graf_loss: bool = True,
+                 graf_accuracy: bool = True, graf_recall: bool = True, graf_precision: bool = True,
+                 graf_f1score: bool = True) -> None:
         """
-        Depending on the entered parameters, the function will plot different graphs.
+        Depending on the entered parameters, the class will plot different graphs.
 
         :param path_for_json_file_logs: This is the path for the json file with logs.
         :param graf_loss: To plot or not to plot the loss.
@@ -25,9 +28,7 @@ class Graf:
 
     def plot_graphics(self) -> None:
         """
-        This function plots.
-
-        :return:
+        This method plots graphs.
         """
         with open(self.path_for_json_file_logs) as json_file:
             data = json.load(json_file)
@@ -83,3 +84,7 @@ class Graf:
                 plt.title('Training and Validation F1_Score')
 
             plt.show()
+
+
+if __name__ == '__main__':
+    GraphingMetrics().plot_graphics()
