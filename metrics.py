@@ -1,12 +1,12 @@
 from typing import Tuple
-
-import tensorflow as tf
-
 from abc import abstractmethod
 
 
+import tensorflow as tf
+
+
 class Metric:
-    def __init__(self, num_classes, is_binary_cross_entropy=False):
+    def __init__(self, num_classes: int, is_binary_cross_entropy: bool = False) -> None:
         """
         Metrics are counted (Recall, Precision, F1Score).
 
@@ -21,7 +21,7 @@ class Metric:
             msg = 'There should be 2 classes with binary cross entropy, got {}.'.format(self.num_classes)
             raise ValueError(msg)
 
-    def confusion_matrix(self, y_true, y_pred) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
+    def confusion_matrix(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
         """
         This functions counts confusion_matrix.
 
@@ -43,16 +43,22 @@ class Metric:
         return fp, fn, tp
 
     @abstractmethod
-    def __call__(self, y_true, y_pred):
+    def __call__(self, y_true: tf.Tensor, y_pred: tf.Tensor):
         raise NotImplementedError('This method must be implemented in subclasses')
 
 
 class Recall(Metric):
-    def __init__(self, num_classes, is_binary_cross_entropy=False):
+    def __init__(self, num_classes: int, is_binary_cross_entropy: bool = False) -> None:
+        """
+        This class calculates the Recall metric.
+
+        :param num_classes: number of classes in the dataset.
+        :param is_binary_cross_entropy: If there are no more than two classes, the value is set to True.
+        """
         super().__init__(num_classes, is_binary_cross_entropy)
         self.__name__ = 'recall'
 
-    def __call__(self, y_true, y_pred) -> tf.Tensor:
+    def __call__(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         """
 
        :param y_true: This is the true mark of validation data.
@@ -64,11 +70,17 @@ class Recall(Metric):
 
 
 class Precision(Metric):
-    def __init__(self, num_classes, is_binary_cross_entropy=False):
+    def __init__(self, num_classes, is_binary_cross_entropy=False) -> None:
+        """
+        This class calculates the Precision metric.
+
+        :param num_classes: number of classes in the dataset.
+        :param is_binary_cross_entropy: If there are no more than two classes, the value is set to True.
+        """
         super().__init__(num_classes, is_binary_cross_entropy)
         self.__name__ = 'precision'
 
-    def __call__(self, y_true, y_pred) -> tf.Tensor:
+    def __call__(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         """
 
         :param y_true: This is the true mark of validation data.
@@ -80,12 +92,20 @@ class Precision(Metric):
 
 
 class F1Score(Metric):
-    def __init__(self, num_classes, is_binary_cross_entropy=False, beta=1):
+    def __init__(self, num_classes: int, is_binary_cross_entropy: bool = False, beta: float = 1):
+        """
+        This class calculates the Precision metric.
+
+        :param num_classes: number of classes in the dataset.
+        :param is_binary_cross_entropy: If there are no more than two classes, the value is set to True.
+        :param beta: with a coefficient of beta = 1, accuracy and completeness equally affect the value of the
+                     F-measure, beta > 1 allows you to give more weight to completeness, and beta < 1-accuracy.
+        """
         super().__init__(num_classes, is_binary_cross_entropy)
         self.beta = beta
         self.__name__ = 'F1_score'
 
-    def __call__(self, y_true, y_pred) -> tf.Tensor:
+    def __call__(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         """
 
         :param y_true: This is the true mark of validation data.
