@@ -31,17 +31,14 @@ def build_model(input_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: in
         'EfficientNetL2': efn.EfficientNetL2
     }
 
-    if MODEL_NAME[:-2].lower() != 'efficientnet':
-        try:
+    try:
+        if MODEL_NAME[:-2].lower() != 'efficientnet':
             name_model, preprocess_input = Classifiers.get(name_model)
             base_model = name_model(input_shape=input_shape, weights=weights, include_top=False)
-        except ValueError:
-            print('the model name is incorrect, please check the model name')
-    else:
-        try:
+        else:
             base_model = models_dict[name_model](input_shape=input_shape, weights=weights, include_top=False)
-        except ValueError:
-            print('the model name is incorrect, please check the model name')
+    except ValueError:
+        raise print('the model name is incorrect, please check the model name')
 
     x = tf.keras.layers.GlobalAveragePooling2D()(base_model.output)
     output = tf.keras.layers.Dense(num_classes, activation='softmax')(x)
