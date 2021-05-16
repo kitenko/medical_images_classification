@@ -8,7 +8,7 @@ import tensorflow as tf
 class Metric:
     def __init__(self, num_classes: int, is_binary_cross_entropy: bool = False) -> None:
         """
-        Metrics are counted (Recall, Precision, F1Score).
+        Metrics are counted False Positive, False Negative, True Positive.
 
         :param num_classes: number of classes in the dataset.
         :param is_binary_cross_entropy: If there are no more than two classes, the value is set to True.
