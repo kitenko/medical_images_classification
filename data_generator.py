@@ -36,10 +36,10 @@ class DataGenerator(keras.utils.Sequence):
 
         if is_train:
             data = data['train']
-            augmentation = images_augmentation(train_data=self.augmentation_data)
+            augmentation = images_augmentation(use_augmentation=self.augmentation_data)
         else:
             data = data['test']
-            augmentation = images_augmentation(train_data=False)
+            augmentation = images_augmentation(use_augmentation=False)
 
         self.aug = augmentation
         self.data = list(data.items())
@@ -75,43 +75,46 @@ class DataGenerator(keras.utils.Sequence):
         images = image_normalization(images)
         return images, labels
 
-    def show(self, batch: Tuple[np.ndarray, np.ndarray], train_data: bool = USE_AUGMENTATION) -> None:
+    def show(self, train_data: bool = USE_AUGMENTATION) -> None:
         """
         This method showing image with label.
 
         :param batch: this is input batch from __getitem__.
         :param train_data: if this parameter is True then augmentation is applied to train dataset.
         """
-        images, labels = batch[0], batch[1]
+        for i in range(len(self)):
+            batch = self[i]
 
-        rows_columns_subplot = self.batch_size
-        while np.math.sqrt(rows_columns_subplot) - int(np.math.sqrt(rows_columns_subplot)) != 0.0:
-            rows_columns_subplot += 1
-        rows_columns_subplot = int(np.math.sqrt(rows_columns_subplot))
+            images, labels = batch[0], batch[1]
 
-        plt.figure(figsize=[20, 20])
-        for i, j in enumerate(images):
-            lable_image = np.where(labels[i] == 1)
-            plt.subplot(rows_columns_subplot, rows_columns_subplot, i+1)
-            plt.imshow(j)
-            if train_data is True:
-                plt.title('Augmented, class = "{}"'.format(lable_image))
-            else:
-                plt.title('Original, class = "{}"'.format(lable_image))
-        if plt.waitforbuttonpress(0):
-            plt.close('all')
-            raise SystemExit
-        plt.close()
+            rows_columns_subplot = self.batch_size
+            while np.math.sqrt(rows_columns_subplot) - int(np.math.sqrt(rows_columns_subplot)) != 0.0:
+                rows_columns_subplot += 1
+            rows_columns_subplot = int(np.math.sqrt(rows_columns_subplot))
+
+            plt.figure(figsize=[20, 20])
+            for i, j in enumerate(images):
+                lable_image = np.where(labels[i] == 1)
+                plt.subplot(rows_columns_subplot, rows_columns_subplot, i+1)
+                plt.imshow(j)
+                if train_data is True:
+                    plt.title('Augmented, class = "{}"'.format(lable_image))
+                else:
+                    plt.title('Original, class = "{}"'.format(lable_image))
+            if plt.waitforbuttonpress(0):
+                plt.close('all')
+                raise SystemExit
+            plt.close()
 
 
-def images_augmentation(train_data: bool = USE_AUGMENTATION) -> A.Compose:
+def images_augmentation(use_augmentation: bool = USE_AUGMENTATION) -> A.Compose:
     """
     This function makes augmentation data.
 
-    :param train_data: if this parameter is True then augmentation is applied to train dataset.
+    :param use_augmentation: if this parameter is True then augmentation is applied to train dataset.
     :return: augment data
     """
-    if train_data is True:
+    if use_augmentation is True:
         aug = A.Compose([
               A.Resize(height=INPUT_SHAPE[0], width=INPUT_SHAPE[1]),
               A.Blur(blur_limit=(1, 4), p=0.2),
@@ -139,5 +142,4 @@ def image_normalization(image: np.ndarray) -> np.ndarray:
 
 if __name__ == '__main__':
     x = DataGenerator()
-    for i in range(len(x)):
-        x.show(x[i])
+    x.show()
