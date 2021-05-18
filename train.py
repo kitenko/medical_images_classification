@@ -7,7 +7,7 @@ from data_generator import DataGenerator
 from metrics import Recall, Precision, F1Score
 from classification_model_git import build_model
 from logcallback import LogCallback
-from config import (NUMBER_OF_CLASSES, EPOCHS, JSON_FILE_PATH, LEARNING_RATE, MODEL_NAME, SAVE_CURRENT_MODEL,
+from config import (NUMBER_OF_CLASSES, EPOCHS, JSON_FILE_PATH_DATA_GEN, LEARNING_RATE, MODEL_NAME, SAVE_CURRENT_MODEL,
                     SAVE_CURRENT_TENSORBOARD_LOGS, TENSORBOARD_LOGS, MODELS_DATA, SAVE_MODELS, LOGS_DIR_CURRENT_MODEL)
 
 
@@ -50,4 +50,4 @@ if __name__ == '__main__':
     devices = tf.config.experimental.list_physical_devices('GPU')
     tf.config.experimental.set_memory_growth(devices[0], True)
 
-    train(JSON_FILE_PATH)
+    train(JSON_FILE_PATH_DATA_GEN)
