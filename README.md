@@ -58,14 +58,18 @@ python graphics.py -logs 'path to json with logs'
 ```shell script
 python test_on_video --weights --path_video
 ```
+> The frame from the real test is shown below.
+> 
+![example_1](examples_for_github/image.jpg)
+
 ## Results
 ### EfficientNetB0
 > The graphs show metrics during model training without loaded "imagenet" weights.
 Prediction examples:
 
-![example_1](examples_for_github/Figure_without_imagenet.png)
+![example_2](examples_for_github/Figure_without_imagenet.png)
 
 >The graphs show metrics during model training with loaded "imagenet" weights.
 Prediction examples:
 > 
-![example_2](examples_for_github/Figure_with_imagenet.png)
+![example_3](examples_for_github/Figure_with_imagenet.png)
