@@ -8,7 +8,7 @@ import tensorflow as tf
 class Metric:
     def __init__(self, num_classes: int, is_binary_cross_entropy: bool = False) -> None:
         """
-        Metrics are counted False Positive, False Negative, True Positive.
+        This class is the parent class for the(Recall, Precision, F1Score) classes.
 
         :param num_classes: number of classes in the dataset.
         :param is_binary_cross_entropy: If there are no more than two classes, the value is set to True.
@@ -25,8 +25,8 @@ class Metric:
         """
         This functions counts confusion_matrix.
 
-        :param y_true: This is the true mark of validation data.
-        :param y_pred: This is the predict mark of validation data.
+        :param y_true: This is the true mark of data.
+        :param y_pred: This is the predict mark of data.
         :return: False Positive, False Negative, True Positive.
         """
         if self.is_binary_cross_entropy:
@@ -61,8 +61,8 @@ class Recall(Metric):
     def __call__(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         """
 
-       :param y_true: This is the true mark of validation data.
-       :param y_pred: This is the predict mark of validation data.
+       :param y_true: This is the true mark of data.
+       :param y_pred: This is the predict mark of data.
        :return: recall recall metric.
        """
         fp, fn, tp = self.confusion_matrix(y_true, y_pred)
@@ -83,8 +83,8 @@ class Precision(Metric):
     def __call__(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         """
 
-        :param y_true: This is the true mark of validation data.
-        :param y_pred: This is the predict mark of validation data.
+        :param y_true: This is the true mark of data.
+        :param y_pred: This is the predict mark of data.6
         :return: precision metric.
         """
         fp, fn, tp = self.confusion_matrix(y_true, y_pred)
@@ -108,8 +108,8 @@ class F1Score(Metric):
     def __call__(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         """
 
-        :param y_true: This is the true mark of validation data.
-        :param y_pred: This is the predict mark of validation data.
+        :param y_true: This is the true mark of data.
+        :param y_pred: This is the predict mark of data.
         :return: f1score metric.
         """
         fp, fn, tp = self.confusion_matrix(y_true, y_pred)
