@@ -7,11 +7,11 @@ import numpy as np
 import albumentations as A
 import matplotlib.pyplot as plt
 
-from config import JSON_FILE_PATH, NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, USE_AUGMENTATION
+from config import JSON_FILE_PATH_DATA_GEN, NUMBER_OF_CLASSES, BATCH_SIZE, INPUT_SHAPE, USE_AUGMENTATION
 
 
 class DataGenerator(keras.utils.Sequence):
-    def __init__(self, json_path: str = JSON_FILE_PATH, batch_size: int = BATCH_SIZE, is_train: bool = True,
+    def __init__(self, json_path: str = JSON_FILE_PATH_DATA_GEN, batch_size: int = BATCH_SIZE, is_train: bool = True,
                  image_shape: Tuple[int, int, int] = INPUT_SHAPE, num_classes: int = NUMBER_OF_CLASSES,
                  augmentation_data: bool = USE_AUGMENTATION) -> None:
         """
@@ -75,7 +75,7 @@ class DataGenerator(keras.utils.Sequence):
         images = image_normalization(images)
         return images, labels
 
-    def show(self, train_data: bool = USE_AUGMENTATION) -> None:
+    def show(self) -> None:
         """
         This method showing image with label.
 
@@ -97,7 +97,7 @@ class DataGenerator(keras.utils.Sequence):
                 lable_image = np.where(labels[i] == 1)
                 plt.subplot(rows_columns_subplot, rows_columns_subplot, i+1)
                 plt.imshow(j)
-                if train_data is True:
+                if self.augmentation_data is True:
                     plt.title('Augmented, class = "{}"'.format(lable_image))
                 else:
                     plt.title('Original, class = "{}"'.format(lable_image))
