@@ -1,17 +1,18 @@
 import os
 import json
 
-from config import JSON_FILE_PATH, DATASET_PATH_IMAGES
+from config import JSON_FILE_PATH_DATA_GEN, DATASET_PATH_IMAGES, JSON_FILE_PATH_INDEX_CLASS
 
 
-def make_data_json(path_for_json: str = JSON_FILE_PATH, data_image: str = DATASET_PATH_IMAGES,
-                   proportion_test_images: float = 0.2) -> None:
+def make_data_json(path_for_json_data_gen: str = JSON_FILE_PATH_DATA_GEN, data_image: str = DATASET_PATH_IMAGES,
+                   proportion_test_images: float = 0.2, json_index_class: str = JSON_FILE_PATH_INDEX_CLASS) -> None:
     """
     This function creates json file with train and test data of images.
 
-    :param path_for_json: this is path where file will save.
+    :param path_for_json_data_gen: this is path where file will save.
     :param proportion_test_images: percentage of test images.
     :param data_image: path for data of images
+    :param json_index_class: this is path where file will save.
     """
 
     path_images, name_images, label_images = [], [], []
@@ -28,7 +29,7 @@ def make_data_json(path_for_json: str = JSON_FILE_PATH, data_image: str = DATASE
 
     path_name_label_zip = zip(path_images, name_images, label_images)
 
-    # create dictionary
+    # create dictionary for data_generator
     train_test_image_json = {'train': {}, 'test': {}}
 
     # create full dict for json file
@@ -44,9 +45,14 @@ def make_data_json(path_for_json: str = JSON_FILE_PATH, data_image: str = DATASE
                  'class_name': label,
                  'index': numeric_index_class[label]
                 }
-    # write json file
-    with open(path_for_json, 'w') as f:
+
+    # write json file for data_generator
+    with open(path_for_json_data_gen, 'w') as f:
         json.dump(train_test_image_json, f, indent=4)
+
+    # write json file with index class
+    with open(json_index_class, 'w') as f:
+        json.dump(numeric_index_class, f, indent=4)
 
 
 if __name__ == '__main__':
