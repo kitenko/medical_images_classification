@@ -3,6 +3,7 @@ import json
 
 import cv2
 import numpy as np
+import tensorflow as tf
 
 from classification_model_git import build_model
 from config import INPUT_SHAPE, JSON_FILE_PATH_INDEX_CLASS
@@ -53,7 +54,7 @@ def visualization() -> None:
 
     args = parse_args()
     model = build_model()
-    model.load_weights(args.weights)
+    model.load_weights('models_data/save_models/EfficientNetB0_imagenet_2021-05-18_00-39-10/EfficientNetB0.h5')
 
     cap = cv2.VideoCapture(args.path_video)
 
@@ -69,7 +70,9 @@ def visualization() -> None:
             image, index_class = preparing_frame(image=frame, model=model)
             class_image = get_key(index, np.argmax(index_class))
             image = cv2.resize(image, (720, 720))
-            cv2.putText(image, class_image, (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+            cv2.putText(image, class_image, (500, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+            cv2.putText(image, 'probability: ' + str(int(np.amax(index_class) * 100)) + '%', (200, 25),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             cv2.imshow('frame', image)
 
             # Press Q on keyboard to  exit
@@ -85,4 +88,6 @@ def visualization() -> None:
 
 
 if __name__ == '__main__':
+    devices = tf.config.experimental.list_physical_devices('GPU')
+    tf.config.experimental.set_memory_growth(devices[0], True)
     visualization()
