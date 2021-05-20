@@ -57,6 +57,7 @@ def visualization() -> None:
     model.load_weights('models_data/save_models/EfficientNetB0_imagenet_2021-05-18_00-39-10/EfficientNetB0.h5')
 
     cap = cv2.VideoCapture(args.path_video)
+    cap = cv2.VideoCapture('test_video/vid_2.avi')
 
     if not cap.isOpened():
         print("Error opening video stream or file")
@@ -70,8 +71,8 @@ def visualization() -> None:
             image, index_class = preparing_frame(image=frame, model=model)
             class_image = get_key(index, np.argmax(index_class))
             image = cv2.resize(image, (720, 720))
-            cv2.putText(image, class_image, (500, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            cv2.putText(image, 'probability: ' + str(int(np.amax(index_class) * 100)) + '%', (200, 25),
+            cv2.putText(image, class_image, (150, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+            cv2.putText(image, str(float("{0:.2f}".format(np.amax(index_class) * 100))) + '%', (500, 25),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             cv2.imshow('frame', image)
 
