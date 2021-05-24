@@ -63,7 +63,7 @@ class Recall(Metric):
 
        :param y_true: This is the true mark of data.
        :param y_pred: This is the predict mark of data.
-       :return: recall recall metric.
+       :return: recall metric.
        """
         fp, fn, tp = self.confusion_matrix(y_true, y_pred)
         return tp / (tp + fn + self.epsilon)
